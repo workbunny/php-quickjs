@@ -1,5 +1,12 @@
 # quickjs 引 擎 绑 定 到 PHP, 实 现 运 行 JS。
 
+| 要求 | 版本 |
+| ---- | ---- |
+| Windows | * |
+| Linux | * |
+| PHP-FFI | * |
+| PHP | 8.1+ |
+
 ## composer
 
 ```composer
