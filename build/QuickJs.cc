@@ -111,8 +111,8 @@ public:
      */
     void quick_free()
     {
-        JS_FreeContext(ctx);
         JS_FreeRuntime(rt);
+        JS_FreeContext(ctx);
     }
 };
 

@@ -116,7 +116,7 @@ class QuickJs
     }
 
     /**
-     * 解析json function
+     * 解析json function (gc崩溃)
      *
      * @param \FFI\CData $run_time 
      * @param \FFI\CData $js_obj
