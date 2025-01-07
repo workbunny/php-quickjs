@@ -79,15 +79,52 @@ class QuickJs
     }
 
     /**
-     * 字符串 function
+     * 转字符串 function
      *
      * @param \FFI\CData $run_time
      * @param \FFI\CData $js_obj
-     * @return mixed
+     * @return string
      */
-    public function toString(\FFI\CData $run_time, \FFI\CData $js_obj): mixed
+    public function toString(\FFI\CData $run_time, \FFI\CData $js_obj): string
     {
         return $this->ffi->quick_js_ToCString($run_time, $js_obj);
+    }
+
+    /**
+     * 转bool function
+     *
+     * @param \FFI\CData $run_time
+     * @param \FFI\CData $js_obj
+     * @return bool
+     */
+    public function toBool(\FFI\CData $run_time, \FFI\CData $js_obj): bool
+    {
+        return $this->ffi->quick_js_ToBool($run_time, $js_obj);
+    }
+
+    /**
+     * 转int function
+     *
+     * @param \FFI\CData $run_time 
+     * @param \FFI\CData $js_obj
+     * @param integer $pres
+     * @return integer
+     */
+    public function toInt(\FFI\CData $run_time, \FFI\CData $js_obj): int
+    {
+        return $this->ffi->quick_js_ToInt($run_time, $js_obj);
+    }
+
+    /**
+     * 解析json function
+     *
+     * @param \FFI\CData $run_time 
+     * @param \FFI\CData $js_obj
+     * @return string
+     */
+    public function JSONStringify(\FFI\CData $run_time, \FFI\CData $js_obj): string
+    {
+        return $this->ffi->quick_js_JSONStringify($run_time, $js_obj);
     }
 
     /**
