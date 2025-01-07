@@ -3,7 +3,7 @@
 // 严格模式
 declare(strict_types=1);
 
-namespace Kingbes;
+namespace Bunny\QuickJs;
 
 /**
  * QuickJs class

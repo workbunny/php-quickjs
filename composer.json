@@ -1,5 +1,5 @@
 {
-    "name": "kingbes/quickjs",
+    "name": "bunny/quickjs",
     "description": "quickjs 引擎绑定 php 实现运行 javascript 应用",
     "keywords": [
         "composer",
@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Kingbes\\": "src/"
+            "Bunny\\QuickJs\\": "src/"
         }
     },
     "minimum-stability": "dev",

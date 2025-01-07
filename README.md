@@ -7,19 +7,11 @@
 | PHP-FFI | * |
 | PHP | 8.1+ |
 
-## composer
-
-```composer
-composer require kingbes/quickjs
-```
-
 ### 例子
 
 ```php
 
-require "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
-
-use Kingbes\QuickJs;
+use Bunny\QuickJs\QuickJs;
 
 // 实例化
 $quick_js = new QuickJs();
