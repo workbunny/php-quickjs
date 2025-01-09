@@ -79,7 +79,7 @@ class QuickJs
     }
 
     /**
-     * 转字符串 function
+     * js对象转字符串 function
      *
      * @param \FFI\CData $run_time
      * @param \FFI\CData $js_obj
@@ -91,7 +91,7 @@ class QuickJs
     }
 
     /**
-     * 转bool function
+     * js对象转bool function
      *
      * @param \FFI\CData $run_time
      * @param \FFI\CData $js_obj
@@ -103,7 +103,7 @@ class QuickJs
     }
 
     /**
-     * 转int function
+     * js对象转int function
      *
      * @param \FFI\CData $run_time 
      * @param \FFI\CData $js_obj
@@ -116,7 +116,7 @@ class QuickJs
     }
 
     /**
-     * 解析json function (gc崩溃)
+     * js对象转json字符串 function
      *
      * @param \FFI\CData $run_time 
      * @param \FFI\CData $js_obj
@@ -125,6 +125,18 @@ class QuickJs
     public function JSONStringify(\FFI\CData $run_time, \FFI\CData $js_obj): string
     {
         return $this->ffi->quick_js_JSONStringify($run_time, $js_obj);
+    }
+
+    /**
+     * json字符串转json对象 function
+     *
+     * @param \FFI\CData $run_time
+     * @param string $json
+     * @return \FFI\CData
+     */
+    public function ParseJSON(\FFI\CData $run_time, string $json): \FFI\CData
+    {
+        return $this->ffi->quick_js_ParseJSON($run_time, $json);
     }
 
     /**

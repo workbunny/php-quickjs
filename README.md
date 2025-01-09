@@ -49,8 +49,11 @@ $quick_js->free($run_time);
 类`QuickJs`
 
 ```php
+/**
+ * QuickJs class
+ */
 class QuickJs
-{
+{   
     /**
      * 构造 function
      *
@@ -88,13 +91,54 @@ class QuickJs
     {}
 
     /**
-     * 字符串 function
+     * js对象转字符串 function
      *
      * @param \FFI\CData $run_time
      * @param \FFI\CData $js_obj
-     * @return mixed
+     * @return string
      */
-    public function toString(\FFI\CData $run_time, \FFI\CData $js_obj): mixed
+    public function toString(\FFI\CData $run_time, \FFI\CData $js_obj): string
+    {}
+
+    /**
+     * js对象转bool function
+     *
+     * @param \FFI\CData $run_time
+     * @param \FFI\CData $js_obj
+     * @return bool
+     */
+    public function toBool(\FFI\CData $run_time, \FFI\CData $js_obj): bool
+    {}
+
+    /**
+     * js对象转int function
+     *
+     * @param \FFI\CData $run_time 
+     * @param \FFI\CData $js_obj
+     * @param integer $pres
+     * @return integer
+     */
+    public function toInt(\FFI\CData $run_time, \FFI\CData $js_obj): int
+    {}
+
+    /**
+     * js对象转json字符串 function
+     *
+     * @param \FFI\CData $run_time 
+     * @param \FFI\CData $js_obj
+     * @return string
+     */
+    public function JSONStringify(\FFI\CData $run_time, \FFI\CData $js_obj): string
+    {}
+
+    /**
+     * json字符串转json对象 function
+     *
+     * @param \FFI\CData $run_time
+     * @param string $json
+     * @return \FFI\CData
+     */
+    public function ParseJSON(\FFI\CData $run_time, string $json): \FFI\CData
     {}
 
     /**

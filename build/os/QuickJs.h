@@ -28,3 +28,5 @@ bool quick_js_ToBool(QuickJS_t quickjs, JSValue val);
 int quick_js_ToInt(QuickJS_t quickjs, JSValue val);
 // js解析json
 const char *quick_js_JSONStringify(QuickJS_t quickjs, JSValue val);
+// json字符串转json对象
+JSValue quick_js_ParseJSON(QuickJS_t quickjs, const char *buf);
