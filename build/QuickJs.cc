@@ -15,7 +15,7 @@ public:
     QuickJS() : rt(JS_NewRuntime()), ctx(JS_NewContext(rt)) {}
     ~QuickJS()
     {
-        // 不需要再调用 quick_free()
+        // 不需要再调用 quickjs_free()
         JS_FreeContext(ctx);
         JS_FreeRuntime(rt);
     }
@@ -30,22 +30,9 @@ public:
      * @param js_code
      * @return JSValue
      */
-    JSValue quick_eval(const char *js_code)
+    JSValue quickjs_eval(const char *js_code)
     {
         JSValue val = JS_Eval(ctx, js_code, strlen(js_code), "quick.js", JS_EVAL_TYPE_GLOBAL);
-        JS_FreeValue(ctx, val);
-        return val;
-    }
-
-    /**
-     * @brief json字符串转json对象
-     *
-     * @param buf
-     * @return JSValue
-     */
-    JSValue quick_js_ParseJSON(const char *buf)
-    {
-        JSValue val = JS_ParseJSON(ctx, buf, strlen(buf), "parse.json");
         JS_FreeValue(ctx, val);
         return val;
     }
@@ -57,9 +44,23 @@ public:
      * @return true
      * @return false
      */
-    bool quick_is_exception(JSValue val)
+    bool quickjs_is_exception(JSValue val)
     {
         return JS_IsException(val);
+    }
+
+    /**
+     * @brief 获取异常信息
+     *
+     * @return const char *
+     */
+    const char *quickjs_get_exception()
+    {
+        JSValue val = JS_GetException(ctx);
+        const char *error = JS_ToCString(ctx, val);
+        JS_FreeCString(ctx, error);
+        JS_FreeValue(ctx, val);
+        return error;
     }
 
     /**
@@ -68,7 +69,7 @@ public:
      * @param val
      * @return const char*
      */
-    inline const char *quick_js_ToCString(JSValue val)
+    inline const char *quickjs_js_ToCString(JSValue val)
     {
         const char *str = JS_ToCString(ctx, val);
         JS_FreeValue(ctx, val);
@@ -82,7 +83,7 @@ public:
      * @param val
      * @return int
      */
-    int quick_js_ToBool(JSValue val)
+    int quickjs_js_ToBool(JSValue val)
     {
         int b = JS_ToBool(ctx, val);
         JS_FreeValue(ctx, val);
@@ -96,7 +97,7 @@ public:
      * @param pres
      * @return int
      */
-    int quick_js_ToInt(JSValue val)
+    int quickjs_js_ToInt(JSValue val)
     {
         int32_t pres;
         if (JS_ToInt32(ctx, &pres, val))
@@ -108,19 +109,134 @@ public:
     }
 
     /**
-     * @brief js解析json
+     * @brief 创建一个JS函数
+     *
+     * @param func 函数指针
+     * @param name 函数名
+     * @param length 参数个数
+     * @return JSValue
+     */
+    JSValue quickjs_new_function(JSCFunction *func, const char *name,
+                                 int length)
+    {
+        JSValue func_val = JS_NewCFunction(ctx, func, name, length);
+        JS_FreeValue(ctx, func_val);
+        return func_val;
+    }
+
+    /**
+     * @brief 创建一个JS的undefined值
+     *
+     * @return JSValue
+     */
+    JSValue quickjs_new_undefined()
+    {
+        JSValue val = JS_UNDEFINED;
+        JS_FreeValue(ctx, val);
+        return val;
+    }
+
+    /**
+     * @brief 创建一个JS的null值
+     *
+     * @return JSValue
+     */
+    JSValue quickjs_new_null()
+    {
+        JSValue val = JS_NULL;
+        JS_FreeValue(ctx, val);
+        return val;
+    }
+
+    /**
+     * @brief 创建一个JS的true值
+     *
+     * @return JSValue
+     */
+    JSValue quickjs_new_true()
+    {
+        JSValue val = JS_TRUE;
+        JS_FreeValue(ctx, val);
+        return val;
+    }
+
+    /**
+     * @brief 创建一个JS的false值
+     *
+     * @return JSValue
+     */
+    JSValue quickjs_new_false()
+    {
+        JSValue val = JS_FALSE;
+        JS_FreeValue(ctx, val);
+        return val;
+    }
+
+    /**
+     * @brief 创建一个JS的字符串
+     *
+     * @param str
+     * @return JSValue
+     */
+    JSValue quickjs_new_string(const char *str)
+    {
+        JSValue val = JS_NewString(ctx, str);
+        JS_FreeValue(ctx, val);
+        return val;
+    }
+
+    /**
+     * @brief 创建一个JS的int
      *
      * @param val
      * @return JSValue
      */
-    const char *quick_js_JSONStringify(JSValue val)
+    JSValue quickjs_new_int(int val)
     {
-        JSValue json_str_val = JS_JSONStringify(ctx, val, JS_UNDEFINED, JS_UNDEFINED);
-        const char *json_str = JS_ToCString(ctx, json_str_val);
-        JS_FreeValue(ctx, val);
-        JS_FreeValue(ctx, json_str_val);
-        JS_FreeCString(ctx, json_str);
-        return json_str;
+        JSValue js_val = JS_NewInt32(ctx, val);
+        JS_FreeValue(ctx, js_val);
+        return js_val;
+    }
+
+    /**
+     * @brief 字符串转json对象
+     *
+     * @param str
+     * @return JSValue
+     */
+    JSValue quickjs_str_to_json(const char *str)
+    {
+        JSValue js_val = JS_ParseJSON(ctx, str, strlen(str), NULL);
+        JS_FreeValue(ctx, js_val);
+        return js_val;
+    }
+
+    /**
+     * @brief 创建一个JS的double
+     *
+     * @param val
+     * @return JSValue
+     */
+    JSValue quickjs_new_double(double val)
+    {
+        JSValue js_val = JS_NewFloat64(ctx, val);
+        JS_FreeValue(ctx, js_val);
+        return js_val;
+    }
+
+    /**
+     * @brief 设置全局变量
+     *
+     * @param property_name 变量名
+     * @param value         值
+     * @return int
+     */
+    int quickjs_set_property_str(const char *property_name, JSValue value)
+    {
+        JSValue global_obj = JS_GetGlobalObject(ctx);
+        int sps = JS_SetPropertyStr(ctx, global_obj, property_name, value);
+        JS_FreeValue(ctx, global_obj);
+        return sps;
     }
 
 private:
@@ -133,15 +249,23 @@ typedef void *QuickJS_t;
 // ---------------- 导出函数
 extern "C"
 {
-    QuickJS_t quickjs_create();                                         // 创建
-    void quickjs_free(QuickJS_t quickjs);                               // 释放
-    JSValue quickjs_eval(QuickJS_t quickjs, const char *js_code);       // 执行js代码
-    bool quickjs_is_exception(QuickJS_t quickjs, JSValue val);          // 判断是否是异常
-    const char *quick_js_ToCString(QuickJS_t quickjs, JSValue val);     // 转字符串
-    int quick_js_ToBool(QuickJS_t quickjs, JSValue val);                // 转bool
-    int quick_js_ToInt(QuickJS_t quickjs, JSValue val);                 // 转int
-    const char *quick_js_JSONStringify(QuickJS_t quickjs, JSValue val); // json对象解析json字符串
-    JSValue quick_js_ParseJSON(QuickJS_t quickjs, const char *buf);     // json字符串转json对象
+    QuickJS_t quickjs_create();                                                                                                                // 创建
+    void quickjs_free(QuickJS_t quickjs);                                                                                                      // 释放
+    JSValue quickjs_eval(QuickJS_t quickjs, const char *js_code);                                                                              // 执行js代码
+    bool quickjs_is_exception(QuickJS_t quickjs, JSValue val);                                                                                 // 判断是否是异常
+    const char *quickjs_js_ToCString(QuickJS_t quickjs, JSValue val);                                                                          // 转字符串
+    int quickjs_js_ToBool(QuickJS_t quickjs, JSValue val);                                                                                     // 转bool
+    int quickjs_js_ToInt(QuickJS_t quickjs, JSValue val);                                                                                      // 转int
+    const char *quickjs_get_exception(QuickJS_t quickjs);                                                                                      // 获取异常信息
+    JSValue quickjs_new_undefined(QuickJS_t quickjs);                                                                                          // 创建一个JS的undefined值
+    JSValue quickjs_new_null(QuickJS_t quickjs);                                                                                               // 创建一个JS的null值
+    JSValue quickjs_new_true(QuickJS_t quickjs);                                                                                               // 创建一个JS的true值
+    JSValue quickjs_new_false(QuickJS_t quickjs);                                                                                              // 创建一个JS的false值
+    JSValue quickjs_new_string(QuickJS_t quickjs, const char *str);                                                                            // 创建一个JS的字符串
+    JSValue quickjs_new_int(QuickJS_t quickjs, int val);                                                                                       // 创建一个JS的int
+    JSValue quickjs_new_json(QuickJS_t quickjs, const char *str);                                                                              // 字符串转json对象
+    JSValue quickjs_new_double(QuickJS_t quickjs, double val);                                                                                 // 创建一个JS的double
+    int quickjs_set_property_str(QuickJS_t quickjs, const char *property_name, JSValue value);                                                 // 设置全局变量
 
     /**
      * @brief 创建
@@ -162,7 +286,7 @@ extern "C"
      */
     EXPORT JSValue quickjs_eval(QuickJS_t quickjs, const char *js_code)
     {
-        return ((QuickJS *)quickjs)->quick_eval(js_code);
+        return ((QuickJS *)quickjs)->quickjs_eval(js_code);
     }
 
     /**
@@ -172,9 +296,9 @@ extern "C"
      * @param val
      * @return EXPORT const*
      */
-    EXPORT const char *quick_js_ToCString(QuickJS_t quickjs, JSValue val)
+    EXPORT const char *quickjs_js_ToCString(QuickJS_t quickjs, JSValue val)
     {
-        return ((QuickJS *)quickjs)->quick_js_ToCString(val);
+        return ((QuickJS *)quickjs)->quickjs_js_ToCString(val);
     }
 
     /**
@@ -184,9 +308,9 @@ extern "C"
      * @param val
      * @return EXPORT
      */
-    EXPORT int quick_js_ToBool(QuickJS_t quickjs, JSValue val)
+    EXPORT int quickjs_js_ToBool(QuickJS_t quickjs, JSValue val)
     {
-        return ((QuickJS *)quickjs)->quick_js_ToBool(val);
+        return ((QuickJS *)quickjs)->quickjs_js_ToBool(val);
     }
 
     /**
@@ -196,21 +320,9 @@ extern "C"
      * @param val
      * @return EXPORT
      */
-    EXPORT int quick_js_ToInt(QuickJS_t quickjs, JSValue val)
+    EXPORT int quickjs_js_ToInt(QuickJS_t quickjs, JSValue val)
     {
-        return ((QuickJS *)quickjs)->quick_js_ToInt(val);
-    }
-
-    /**
-     * @brief js解析json
-     *
-     * @param quickjs
-     * @param val
-     * @return const*
-     */
-    EXPORT const char *quick_js_JSONStringify(QuickJS_t quickjs, JSValue val)
-    {
-        return ((QuickJS *)quickjs)->quick_js_JSONStringify(val);
+        return ((QuickJS *)quickjs)->quickjs_js_ToInt(val);
     }
 
     /**
@@ -223,19 +335,18 @@ extern "C"
      */
     EXPORT bool quickjs_is_exception(QuickJS_t quickjs, JSValue val)
     {
-        return ((QuickJS *)quickjs)->quick_is_exception(val);
+        return ((QuickJS *)quickjs)->quickjs_is_exception(val);
     }
 
     /**
-     * @brief json字符串转json对象
+     * @brief 获取异常信息
      *
      * @param quickjs
-     * @param buf
-     * @return JSValue
+     * @return const char *
      */
-    EXPORT JSValue quick_js_ParseJSON(QuickJS_t quickjs, const char *buf)
+    EXPORT const char *quickjs_get_exception(QuickJS_t quickjs)
     {
-        return ((QuickJS *)quickjs)->quick_js_ParseJSON(buf);
+        return ((QuickJS *)quickjs)->quickjs_get_exception();
     }
 
     /**
@@ -246,5 +357,110 @@ extern "C"
     EXPORT void quickjs_free(QuickJS_t quickjs)
     {
         delete static_cast<QuickJS *>(quickjs);
+    }
+
+    /**
+     * @brief 创建一个JS的undefined值
+     *
+     * @param quickjs
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_undefined(QuickJS_t quickjs)
+    {
+        return ((QuickJS *)quickjs)->quickjs_new_undefined();
+    }
+
+    /**
+     * @brief 创建一个JS的null值
+     *
+     * @param quickjs
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_null(QuickJS_t quickjs)
+    {
+        return ((QuickJS *)quickjs)->quickjs_new_null();
+    }
+
+    /**
+     * @brief 创建一个JS的true值
+     *
+     * @param quickjs
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_true(QuickJS_t quickjs)
+    {
+        return ((QuickJS *)quickjs)->quickjs_new_true();
+    }
+
+    /**
+     * @brief 创建一个JS的false值
+     *
+     * @param quickjs
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_false(QuickJS_t quickjs)
+    {
+        return ((QuickJS *)quickjs)->quickjs_new_false();
+    }
+
+    /**
+     * @brief 创建一个JS的字符串
+     *
+     * @param quickjs
+     * @param str
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_string(QuickJS_t quickjs, const char *str)
+    {
+        return ((QuickJS *)quickjs)->quickjs_new_string(str);
+    }
+
+    /**
+     * @brief 创建一个JS的int
+     *
+     * @param quickjs
+     * @param val
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_int(QuickJS_t quickjs, int val)
+    {
+        return ((QuickJS *)quickjs)->quickjs_new_int(val);
+    }
+
+    /**
+     * @brief 字符串转json对象
+     *
+     * @param quickjs
+     * @param str
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_json(QuickJS_t quickjs, const char *str)
+    {
+        return ((QuickJS *)quickjs)->quickjs_str_to_json(str);
+    }
+
+    /**
+     * @brief 创建一个JS的double
+     *
+     * @param quickjs
+     * @param val
+     * @return JSValue
+     */
+    EXPORT JSValue quickjs_new_double(QuickJS_t quickjs, double val)
+    {
+        return ((QuickJS *)quickjs)->quickjs_new_double(val);
+    }
+
+    /**
+     * @brief 设置全局变量
+     *
+     * @param quickjs
+     * @param property_name 变量名
+     * @param value 值
+     * @return int
+     */
+    EXPORT int quickjs_set_property_str(QuickJS_t quickjs, const char *property_name, JSValue value)
+    {
+        return ((QuickJS *)quickjs)->quickjs_set_property_str(property_name, value);
     }
 }

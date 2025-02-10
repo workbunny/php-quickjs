@@ -79,6 +79,17 @@ class QuickJs
     }
 
     /**
+     * 获取异常信息 function
+     *
+     * @param \FFI\CData $run_time
+     * @return string
+     */
+    public function getException(\FFI\CData $run_time): string
+    {
+        return $this->ffi->quickjs_get_exception($run_time);
+    }
+
+    /**
      * js对象转字符串 function
      *
      * @param \FFI\CData $run_time
@@ -87,7 +98,7 @@ class QuickJs
      */
     public function toString(\FFI\CData $run_time, \FFI\CData $js_obj): string
     {
-        return $this->ffi->quick_js_ToCString($run_time, $js_obj);
+        return $this->ffi->quickjs_js_ToCString($run_time, $js_obj);
     }
 
     /**
@@ -99,7 +110,7 @@ class QuickJs
      */
     public function toBool(\FFI\CData $run_time, \FFI\CData $js_obj): bool
     {
-        return $this->ffi->quick_js_ToBool($run_time, $js_obj);
+        return $this->ffi->quickjs_js_ToBool($run_time, $js_obj);
     }
 
     /**
@@ -112,31 +123,7 @@ class QuickJs
      */
     public function toInt(\FFI\CData $run_time, \FFI\CData $js_obj): int
     {
-        return $this->ffi->quick_js_ToInt($run_time, $js_obj);
-    }
-
-    /**
-     * js对象转json字符串 function
-     *
-     * @param \FFI\CData $run_time 
-     * @param \FFI\CData $js_obj
-     * @return string
-     */
-    public function JSONStringify(\FFI\CData $run_time, \FFI\CData $js_obj): string
-    {
-        return $this->ffi->quick_js_JSONStringify($run_time, $js_obj);
-    }
-
-    /**
-     * json字符串转json对象 function
-     *
-     * @param \FFI\CData $run_time
-     * @param string $json
-     * @return \FFI\CData
-     */
-    public function ParseJSON(\FFI\CData $run_time, string $json): \FFI\CData
-    {
-        return $this->ffi->quick_js_ParseJSON($run_time, $json);
+        return $this->ffi->quickjs_js_ToInt($run_time, $js_obj);
     }
 
     /**
@@ -148,5 +135,97 @@ class QuickJs
     public function free(\FFI\CData $run_time): void
     {
         $this->ffi->quickjs_free($run_time);
+    }
+
+    /**
+     * 创建JS的undefined值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @return \FFI\CData
+     */
+    public function newUndefined(\FFI\CData $run_time): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_undefined($run_time);
+    }
+
+    /**
+     * 创建JS的null值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @return \FFI\CData
+     */
+    public function newNull(\FFI\CData $run_time): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_null($run_time);
+    }
+
+    /**
+     * 创建JS的true值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @return \FFI\CData
+     */
+    public function newTrue(\FFI\CData $run_time): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_true($run_time);
+    }
+
+    /**
+     * 创建JS的false值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @return \FFI\CData
+     */
+    public function newFalse(\FFI\CData $run_time): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_false($run_time);
+    }
+
+    /**
+     * 创建JS的字符串值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @param string $str 字符串
+     * @return \FFI\CData
+     */
+    public function newString(\FFI\CData $run_time, string $str): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_string($run_time, $str);
+    }
+
+    /**
+     * 创建JS的int值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @param integer $int int值
+     * @return \FFI\CData
+     */
+    public function newInt(\FFI\CData $run_time, int $int): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_int($run_time, $int);
+    }
+
+    /**
+     * 创建JS的json值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @param string $json json字符串
+     * @return \FFI\CData
+     */
+    public function newJson(\FFI\CData $run_time, string $json): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_json($run_time, $json);
+    }
+
+    /**
+     * 创建JS的double值 function
+     *
+     * @param \FFI\CData $run_time JS运行时对象
+     * @param float $float double值
+     * @return \FFI\CData
+     */
+    public function newFloat(\FFI\CData $run_time, float $float): \FFI\CData
+    {
+        return $this->ffi->quickjs_new_float($run_time, $float);
     }
 }
